@@ -136,6 +136,17 @@
       padding: 0 20px 12px;
       text-align: right;
     }
+
+    .scene-hint {
+      font-size: 11px;
+      color: #aab4c0;
+      font-style: italic;
+      margin-top: 2px;
+      min-height: 16px;
+      padding: 0 20px;
+      width: 100%;
+      max-width: 700px;
+    }
   </style>
 </head>
 <body>
@@ -144,6 +155,7 @@
   <div class="eyebrow">Climate Data · NASA GISS</div>
   <h1 id="scene-title">The Long View: 144 Years of Temperature Records</h1>
   <p class="scene-sub" id="scene-sub">Annual global surface temperature anomaly relative to the 1951–1980 average</p>
+  <p class="scene-hint" id="scene-hint">↔ Hover over the chart to see individual year values</p>
 </header>
 
 <div id="chart-container"></div>
@@ -570,6 +582,8 @@ function renderScene(n) {
   document.getElementById("scene-ctr").textContent   = `${n + 1} of ${SCENES.length}`;
   document.getElementById("btn-prev").disabled        = (n === 0);
   document.getElementById("btn-next").disabled        = (n === SCENES.length - 1);
+  // Show tooltip hint only on Scene 1 (the line chart with hover interaction)
+  document.getElementById("scene-hint").textContent  = n === 0 ? "↔ Hover over the chart to see individual year values" : "";
 
   document.querySelectorAll(".dot")
     .forEach((el, i) => el.classList.toggle("active", i === n));
