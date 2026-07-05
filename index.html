@@ -1,790 +1,686 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work, Health & Well-Being Across OECD Nations</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#eef2f7;color:#1c2b3a;min-height:100vh;display:flex;flex-direction:column}
-a{color:inherit}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Predicts Life Satisfaction? OECD 2024</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Header ── */
-header{background:#1c2b3a;color:#fff;padding:36px 24px 32px}
-.header-inner{max-width:920px;margin:0 auto}
-.header-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px}
-.header-title{font-family:'Playfair Display',Georgia,serif;font-size:clamp(24px,4vw,38px);font-weight:700;line-height:1.18;margin-bottom:10px}
-.header-sub{font-size:15px;color:#cbd5e1;font-weight:300;line-height:1.5;max-width:560px}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      background: #f0ede8;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 36px 20px 48px;
+    }
 
-/* ── Main layout ── */
-main{flex:1;padding:28px 16px 40px}
-.story-wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    #container {
+      background: #ffffff;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.06);
+      padding: 36px 44px 32px;
+      max-width: 980px;
+      width: 100%;
+    }
 
-/* ── Top scene dots ── */
-.scene-nav-top{display:flex;align-items:center;gap:10px}
-.scene-nav-top button{width:28px;height:4px;border:none;border-radius:2px;cursor:pointer;background:#cbd5e1;transition:background .25s,width .25s}
-.scene-nav-top button.active{background:#2471a3;width:40px}
-.scene-nav-top button:hover:not(.active){background:#94a3b8}
+    /* ---- Header ---- */
+    header { margin-bottom: 28px; border-bottom: 2px solid #1a1a2e; padding-bottom: 18px; }
 
-/* ── Scene header ── */
-.scene-header{display:flex;align-items:flex-start;gap:18px}
-.scene-badge{display:flex;flex-direction:column;align-items:center;background:#2471a3;color:#fff;border-radius:8px;padding:8px 14px;min-width:52px;flex-shrink:0}
-.scene-badge .lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
-.scene-badge .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1}
-.scene-text h2{font-family:'Playfair Display',Georgia,serif;font-size:clamp(18px,3vw,24px);font-weight:700;color:#1c2b3a;margin-bottom:6px;line-height:1.25}
-.scene-text p{font-size:13.5px;line-height:1.6;color:#475569;max-width:680px}
+    header h1 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -0.4px;
+      margin-bottom: 5px;
+    }
 
-/* ── Chart card ── */
-.chart-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px 20px 14px;overflow:hidden;position:relative}
-#chart{display:block;width:100%;max-width:860px;margin:0 auto}
+    header p.subtitle { font-size: 12.5px; color: #888; }
 
-/* ── Tooltip ── */
-#tooltip{position:fixed;background:rgba(28,43,58,.95);color:#fff;padding:9px 13px;border-radius:7px;font-size:12px;pointer-events:none;display:none;z-index:200;min-width:150px;max-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.3);line-height:1.5}
-#tooltip strong{display:block;font-size:13px;margin-bottom:3px;color:#e2e8f0}
-#tooltip .tt-row{display:flex;justify-content:space-between;gap:12px}
-#tooltip .tt-val{font-weight:600;color:#f0f9ff}
+    /* ---- Scene indicators ---- */
+    #indicators {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
 
-/* ── Controls ── */
-.controls-wrap{background:#fff;border-radius:10px;padding:14px 20px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.control-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.control-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#64748b;min-width:40px}
-.control-value{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#2471a3;min-width:44px}
-#year-slider{flex:1;min-width:200px;accent-color:#2471a3;cursor:pointer;height:4px}
-.year-marks{display:flex;justify-content:space-between;width:100%;margin-top:4px;font-size:10px;color:#94a3b8;letter-spacing:.02em}
-#country-select{border:1.5px solid #cbd5e1;border-radius:6px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#1c2b3a;cursor:pointer;background:#fff;min-width:200px}
-#country-select:focus{outline:none;border-color:#2471a3}
+    .indicator {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: #ddd;
+      transition: background 0.35s;
+      cursor: default;
+    }
+    .indicator.active { background: #1a1a2e; }
 
-/* ── Navigation ── */
-.nav-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.btn-nav{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;transition:background .2s,color .2s,opacity .2s;background:#2471a3;color:#fff;letter-spacing:.02em}
-.btn-nav:disabled{opacity:.3;cursor:not-allowed}
-.btn-nav:not(:disabled):hover{background:#1a5276}
-.nav-dots{display:flex;align-items:center;gap:8px}
-.nav-dots .dot{width:32px;height:4px;border:none;border-radius:2px;cursor:pointer;background:#cbd5e1;transition:background .25s,width .25s;padding:0}
-.nav-dots .dot.active{background:#2471a3;width:44px}
-.nav-dots .dot:hover:not(.active){background:#94a3b8}
+    /* ---- Scene header ---- */
+    #scene-header { margin-bottom: 6px; min-height: 46px; }
 
-/* ── Footer ── */
-footer{background:#1c2b3a;color:#64748b;font-size:11.5px;padding:16px 24px;line-height:1.6}
-.footer-inner{max-width:920px;margin:0 auto}
-footer strong{color:#94a3b8}
+    #scene-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
 
-/* ── Legend chip ── */
-.legend-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#475569}
-.legend-swatch{display:inline-block;width:12px;height:12px;border-radius:2px}
-</style>
+    #scene-sub {
+      font-size: 11.5px;
+      color: #999;
+      line-height: 1.45;
+    }
+
+    /* ---- Chart ---- */
+    #chart { margin: 4px 0 2px; }
+    #chart svg { display: block; }
+
+    /* Axes and grid */
+    .axis text { fill: #888; font-size: 11px; }
+    .axis .domain { stroke: #ddd; }
+    .axis .tick line { stroke: #e8e8e8; }
+    .grid line { stroke: #efefef; stroke-width: 1px; }
+
+    /* ---- Hint ---- */
+    #hint {
+      font-size: 11px;
+      color: #bbb;
+      font-style: italic;
+      text-align: center;
+      margin: 4px 0 22px;
+    }
+
+    /* ---- Navigation ---- */
+    #nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    #nav button {
+      padding: 9px 24px;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      border: 1.5px solid #ccc;
+      border-radius: 5px;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.14s, color 0.14s;
+      min-width: 110px;
+      letter-spacing: 0.1px;
+    }
+
+    #nav button:hover:not(:disabled) {
+      background: #f4f2ef;
+      border-color: #999;
+    }
+
+    #nav button:disabled {
+      color: #ccc;
+      border-color: #e8e8e8;
+      cursor: not-allowed;
+      background: #fafafa;
+    }
+
+    #scene-counter {
+      font-size: 12.5px;
+      color: #aaa;
+      min-width: 80px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      border-top: 1px solid #efefef;
+      padding-top: 12px;
+      font-size: 11px;
+      color: #bbb;
+      text-align: center;
+    }
+
+    /* ---- Tooltip ---- */
+    #tooltip {
+      position: fixed;
+      background: rgba(18, 18, 30, 0.92);
+      color: #fff;
+      padding: 9px 13px;
+      border-radius: 5px;
+      font-size: 12px;
+      line-height: 1.55;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+      max-width: 220px;
+      z-index: 9999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    #tooltip .t-name  { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+    #tooltip .t-row   { color: #ccd; font-size: 11.5px; }
+    #tooltip .t-row span { color: #fff; font-weight: 600; }
+
+    /* ---- D3 annotation styles ---- */
+    .annotation-group { pointer-events: none; }
+
+    .annotation path.connector,
+    .annotation path.connector-arrow { stroke: rgba(40,40,60,0.55); stroke-width: 1.5px; fill: none; }
+
+    .annotation rect.annotation-note-bg {
+      fill: rgba(24, 24, 40, 0.90);
+      rx: 4px; ry: 4px;
+    }
+
+    .annotation text { fill: #fff; }
+    .annotation text.annotation-note-title { font-size: 12px; font-weight: 700; }
+    .annotation text.annotation-note-label { font-size: 11px; fill: #ccd; }
+
+    /* trend line */
+    .trend-line {
+      stroke: #ccc;
+      stroke-width: 1.6px;
+      stroke-dasharray: 5, 4;
+      pointer-events: none;
+    }
+
+    /* axis label */
+    .axis-label {
+      fill: #666;
+      font-size: 11.5px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="header-eyebrow">OECD How's Life? Database · 38 Nations · 2010–2015</div>
-    <h1 class="header-title">Work, Health &amp; Well-Being<br>Across OECD Nations</h1>
-    <p class="header-sub">Employment recovered after the 2008 financial crisis — but the burden of despair did not follow the same path.</p>
-  </div>
-</header>
+<div id="container">
 
-<main>
-<div class="story-wrap">
+  <header>
+    <h1>What Predicts Life Satisfaction Across Nations?</h1>
+    <p class="subtitle">OECD How's Life? Well-Being Indicators &middot; 2024 &middot; Sex: Total &middot; 29 countries</p>
+  </header>
 
-  <!-- Top scene indicator -->
-  <div class="scene-nav-top" id="top-dots">
-    <button class="active" onclick="goToScene(0)" title="Scene 1: Employment Recovery"></button>
-    <button onclick="goToScene(1)" title="Scene 2: Deaths of Despair"></button>
-    <button onclick="goToScene(2)" title="Scene 3: Country Explorer"></button>
+  <div id="indicators">
+    <div class="indicator active" data-scene="0"></div>
+    <div class="indicator"        data-scene="1"></div>
+    <div class="indicator"        data-scene="2"></div>
   </div>
 
-  <!-- Scene header -->
-  <div class="scene-header">
-    <div class="scene-badge">
-      <span class="lbl">Scene</span>
-      <span class="num" id="scene-num">01</span>
-    </div>
-    <div class="scene-text">
-      <h2 id="scene-title">The Employment Recovery</h2>
-      <p id="scene-desc">After the 2008 financial crisis, most OECD nations gradually rebuilt their labor markets. Use the year slider to watch employment rates shift — but note how large the gap between leaders and laggards remains throughout.</p>
-    </div>
+  <div id="scene-header">
+    <h2 id="scene-title"></h2>
+    <p  id="scene-sub"></p>
   </div>
 
-  <!-- Chart -->
-  <div class="chart-card">
-    <svg id="chart"></svg>
-    <div id="tooltip"></div>
+  <div id="chart"></div>
+  <p id="hint">Hover over any country for details</p>
+
+  <div id="nav">
+    <button id="btn-back" disabled>&#8592; Back</button>
+    <span id="scene-counter">Scene 1 of 3</span>
+    <button id="btn-next">Next &#8594;</button>
   </div>
 
-  <!-- Controls -->
-  <div class="controls-wrap">
-    <div id="year-control" class="control-row">
-      <span class="control-label">Year</span>
-      <span class="control-value" id="year-display">2010</span>
-      <input type="range" id="year-slider" min="2010" max="2015" value="2010" step="1">
-      <div class="year-marks">
-        <span>2010</span><span>2011</span><span>2012</span><span>2013</span><span>2014</span><span>2015</span>
-      </div>
-    </div>
-    <div id="country-control" class="control-row" style="display:none">
-      <span class="control-label">Country</span>
-      <select id="country-select"></select>
-    </div>
-  </div>
-
-  <!-- Navigation -->
-  <div class="nav-row">
-    <button id="btn-back" class="btn-nav" disabled onclick="navigate(-1)">← Back</button>
-    <div class="nav-dots">
-      <button class="dot active" onclick="goToScene(0)"></button>
-      <button class="dot" onclick="goToScene(1)"></button>
-      <button class="dot" onclick="goToScene(2)"></button>
-    </div>
-    <button id="btn-next" class="btn-nav" onclick="navigate(1)">Next →</button>
-  </div>
+  <footer>
+    Source: Organisation for Economic Co-operation and Development (OECD),
+    How's Life? Well-Being Indicators, Current Well-Being module, 2024.
+  </footer>
 
 </div>
-</main>
 
-<footer>
-  <div class="footer-inner">
-    <strong>Source:</strong> OECD How's Life? Database (2024), Current Well-Being dataset. 
-    Indicators: Employment Rate (% population 25–64) · Deaths from Suicide, Alcohol &amp; Drugs (per 100,000). 
-    OECD.WISE.WDP / DSD_HSL@DF_HSL_CWB / v1.1. 2010–2015.
-  </div>
-</footer>
+<div id="tooltip">
+  <div class="t-name" id="tt-name"></div>
+  <div class="t-row"  id="tt-sat"></div>
+  <div class="t-row"  id="tt-x"></div>
+</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════════════
-const RAW_DATA = [{"y":2010,"c":"Australia","r":"Anglo-Saxon","e":75.444,"d":14.882,"l":null,"h":13.99},{"y":2010,"c":"Austria","r":"Central Europe","e":74.646,"d":24.496,"l":null,"h":9.0},{"y":2010,"c":"Belgium","r":"Central Europe","e":70.266,"d":22.504,"l":80.3,"h":4.45},{"y":2010,"c":"Canada","r":"Anglo-Saxon","e":75.252,"d":18.564,"l":81.4,"h":4.01},{"y":2010,"c":"Chile","r":"Americas","e":69.816,"d":24.661,"l":78.7,"h":17.17},{"y":2010,"c":"Colombia","r":"Americas","e":72.041,"d":13.431,"l":74.3,"h":34.8},{"y":2010,"c":"Costa Rica","r":"Americas","e":null,"d":12.381,"l":79.1,"h":null},{"y":2010,"c":"Czechia","r":"Eastern Europe","e":73.452,"d":20.863,"l":77.7,"h":8.74},{"y":2010,"c":"Denmark","r":"Nordic","e":76.004,"d":15.873,"l":null,"h":1.57},{"y":2010,"c":"Estonia","r":"Eastern Europe","e":70.028,"d":null,"l":76.0,"h":3.6},{"y":2010,"c":"Finland","r":"Nordic","e":74.62,"d":51.981,"l":80.2,"h":3.89},{"y":2010,"c":"France","r":"Central Europe","e":71.248,"d":20.18,"l":81.8,"h":null},{"y":2010,"c":"Germany","r":"Central Europe","e":76.15,"d":18.289,"l":80.5,"h":5.14},{"y":2010,"c":"Greece","r":"Mediterranean","e":66.604,"d":null,"l":80.6,"h":5.15},{"y":2010,"c":"Hungary","r":"Eastern Europe","e":null,"d":35.904,"l":74.7,"h":3.24},{"y":2010,"c":"Iceland","r":"Nordic","e":81.308,"d":20.304,"l":81.9,"h":14.45},{"y":2010,"c":"Ireland","r":"Anglo-Saxon","e":66.54,"d":16.195,"l":null,"h":3.5},{"y":2010,"c":"Israel","r":"Other","e":71.871,"d":10.768,"l":81.7,"h":18.92},{"y":2010,"c":"Italy","r":"Mediterranean","e":63.367,"d":15.065,"l":82.2,"h":4.6},{"y":2010,"c":"Japan","r":"Other","e":75.915,"d":26.697,"l":82.9,"h":null},{"y":2010,"c":"Korea","r":"Other","e":71.581,"d":null,"l":80.2,"h":null},{"y":2010,"c":"Latvia","r":"Eastern Europe","e":67.216,"d":47.751,"l":null,"h":2.49},{"y":2010,"c":"Lithuania","r":"Eastern Europe","e":68.367,"d":55.905,"l":null,"h":0.66},{"y":2010,"c":"Luxembourg","r":"Central Europe","e":74.219,"d":18.772,"l":80.8,"h":3.68},{"y":2010,"c":"Mexico","r":"Americas","e":66.722,"d":null,"l":74.3,"h":29.28},{"y":2010,"c":"Netherlands","r":"Central Europe","e":76.937,"d":null,"l":81.0,"h":0.68},{"y":2010,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":15.693,"l":80.8,"h":null},{"y":2010,"c":"Norway","r":"Nordic","e":81.057,"d":17.937,"l":81.2,"h":2.65},{"y":2010,"c":"Poland","r":"Eastern Europe","e":66.819,"d":26.743,"l":76.4,"h":7.39},{"y":2010,"c":"Portugal","r":"Mediterranean","e":72.656,"d":13.537,"l":80.1,"h":4.94},{"y":2010,"c":"Slovak Republic","r":"Eastern Europe","e":68.433,"d":22.938,"l":null,"h":5.41},{"y":2010,"c":"Slovenia","r":"Eastern Europe","e":72.71,"d":56.931,"l":79.8,"h":6.08},{"y":2010,"c":"Spain","r":"Mediterranean","e":64.986,"d":null,"l":82.4,"h":null},{"y":2010,"c":"Sweden","r":"Nordic","e":80.719,"d":17.723,"l":81.6,"h":1.28},{"y":2010,"c":"Switzerland","r":"Central Europe","e":80.43,"d":14.972,"l":82.7,"h":0.44},{"y":2010,"c":"T\u00fcrkiye","r":"Other","e":51.516,"d":6.043,"l":null,"h":45.62},{"y":2010,"c":"United Kingdom","r":"Anglo-Saxon","e":74.53,"d":12.738,"l":null,"h":11.72},{"y":2010,"c":"United States","r":"Anglo-Saxon","e":71.796,"d":23.856,"l":null,"h":10.76},{"y":2011,"c":"Australia","r":"Anglo-Saxon","e":75.799,"d":14.99,"l":null,"h":14.14},{"y":2011,"c":"Austria","r":"Central Europe","e":74.744,"d":24.652,"l":null,"h":8.72},{"y":2011,"c":"Belgium","r":"Central Europe","e":69.978,"d":23.23,"l":80.7,"h":4.44},{"y":2011,"c":"Canada","r":"Anglo-Saxon","e":75.559,"d":17.697,"l":81.6,"h":4.2},{"y":2011,"c":"Chile","r":"Americas","e":71.835,"d":23.097,"l":79.0,"h":16.37},{"y":2011,"c":"Colombia","r":"Americas","e":73.044,"d":12.341,"l":74.5,"h":35.24},{"y":2011,"c":"Costa Rica","r":"Americas","e":null,"d":12.628,"l":79.1,"h":null},{"y":2011,"c":"Czechia","r":"Eastern Europe","e":74.171,"d":21.42,"l":78.0,"h":7.57},{"y":2011,"c":"Denmark","r":"Nordic","e":76.067,"d":16.037,"l":null,"h":1.66},{"y":2011,"c":"Estonia","r":"Eastern Europe","e":73.381,"d":null,"l":76.6,"h":4.05},{"y":2011,"c":"Finland","r":"Nordic","e":75.373,"d":50.568,"l":80.6,"h":3.89},{"y":2011,"c":"France","r":"Central Europe","e":71.171,"d":20.062,"l":82.3,"h":null},{"y":2011,"c":"Germany","r":"Central Europe","e":77.674,"d":18.143,"l":80.6,"h":5.42},{"y":2011,"c":"Greece","r":"Mediterranean","e":62.465,"d":null,"l":80.8,"h":5.17},{"y":2011,"c":"Hungary","r":"Eastern Europe","e":null,"d":33.308,"l":75.1,"h":3.09},{"y":2011,"c":"Iceland","r":"Nordic","e":81.234,"d":18.938,"l":82.4,"h":15.76},{"y":2011,"c":"Ireland","r":"Anglo-Saxon","e":65.614,"d":18.176,"l":null,"h":3.79},{"y":2011,"c":"Israel","r":"Other","e":72.861,"d":10.668,"l":81.8,"h":17.58},{"y":2011,"c":"Italy","r":"Mediterranean","e":63.583,"d":13.635,"l":82.4,"h":4.02},{"y":2011,"c":"Japan","r":"Other","e":76.046,"d":26.166,"l":82.7,"h":null},{"y":2011,"c":"Korea","r":"Other","e":72.215,"d":null,"l":80.6,"h":null},{"y":2011,"c":"Latvia","r":"Eastern Europe","e":69.46,"d":45.76,"l":null,"h":2.27},{"y":2011,"c":"Lithuania","r":"Eastern Europe","e":71.125,"d":55.184,"l":null,"h":0.52},{"y":2011,"c":"Luxembourg","r":"Central Europe","e":73.746,"d":17.841,"l":81.1,"h":2.6},{"y":2011,"c":"Mexico","r":"Americas","e":67.199,"d":null,"l":74.8,"h":28.56},{"y":2011,"c":"Netherlands","r":"Central Europe","e":null,"d":null,"l":81.3,"h":0.66},{"y":2011,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":14.505,"l":81.0,"h":null},{"y":2011,"c":"Norway","r":"Nordic","e":81.265,"d":16.971,"l":81.4,"h":2.88},{"y":2011,"c":"Poland","r":"Eastern Europe","e":67.259,"d":25.583,"l":76.8,"h":7.27},{"y":2011,"c":"Portugal","r":"Mediterranean","e":68.715,"d":12.386,"l":80.7,"h":8.05},{"y":2011,"c":"Slovak Republic","r":"Eastern Europe","e":68.767,"d":null,"l":null,"h":6.11},{"y":2011,"c":"Slovenia","r":"Eastern Europe","e":70.844,"d":56.163,"l":80.1,"h":5.55},{"y":2011,"c":"Spain","r":"Mediterranean","e":64.372,"d":null,"l":82.6,"h":null},{"y":2011,"c":"Sweden","r":"Nordic","e":81.971,"d":17.762,"l":81.9,"h":1.2},{"y":2011,"c":"Switzerland","r":"Central Europe","e":81.525,"d":15.221,"l":82.8,"h":0.42},{"y":2011,"c":"T\u00fcrkiye","r":"Other","e":53.55,"d":5.579,"l":null,"h":46.13},{"y":2011,"c":"United Kingdom","r":"Anglo-Saxon","e":74.399,"d":12.979,"l":null,"h":12.04},{"y":2011,"c":"United States","r":"Anglo-Saxon","e":71.654,"d":24.542,"l":null,"h":11.03},{"y":2012,"c":"Australia","r":"Anglo-Saxon","e":75.589,"d":15.208,"l":null,"h":14.18},{"y":2012,"c":"Austria","r":"Central Europe","e":75.154,"d":23.691,"l":null,"h":8.53},{"y":2012,"c":"Belgium","r":"Central Europe","e":70.05,"d":23.444,"l":80.5,"h":4.4},{"y":2012,"c":"Canada","r":"Anglo-Saxon","e":76.015,"d":18.672,"l":81.8,"h":4.22},{"y":2012,"c":"Chile","r":"Americas","e":72.703,"d":20.426,"l":79.2,"h":15.5},{"y":2012,"c":"Colombia","r":"Americas","e":73.695,"d":12.667,"l":74.7,"h":34.07},{"y":2012,"c":"Costa Rica","r":"Americas","e":null,"d":11.177,"l":79.4,"h":null},{"y":2012,"c":"Czechia","r":"Eastern Europe","e":74.718,"d":21.361,"l":78.1,"h":7.13},{"y":2012,"c":"Denmark","r":"Nordic","e":75.871,"d":15.72,"l":null,"h":1.76},{"y":2012,"c":"Estonia","r":"Eastern Europe","e":74.902,"d":null,"l":76.7,"h":3.55},{"y":2012,"c":"Finland","r":"Nordic","e":75.585,"d":50.103,"l":80.7,"h":3.7},{"y":2012,"c":"France","r":"Central Europe","e":71.513,"d":19.04,"l":82.1,"h":null},{"y":2012,"c":"Germany","r":"Central Europe","e":78.202,"d":17.653,"l":80.7,"h":5.61},{"y":2012,"c":"Greece","r":"Mediterranean","e":57.892,"d":null,"l":80.7,"h":5.62},{"y":2012,"c":"Hungary","r":"Eastern Europe","e":null,"d":30.053,"l":75.3,"h":2.91},{"y":2012,"c":"Iceland","r":"Nordic","e":81.789,"d":21.0,"l":83.0,"h":16.14},{"y":2012,"c":"Ireland","r":"Anglo-Saxon","e":65.65,"d":16.456,"l":null,"h":3.96},{"y":2012,"c":"Israel","r":"Other","e":74.035,"d":10.468,"l":81.8,"h":18.77},{"y":2012,"c":"Italy","r":"Mediterranean","e":63.543,"d":13.406,"l":82.4,"h":3.7},{"y":2012,"c":"Japan","r":"Other","e":76.388,"d":24.039,"l":83.2,"h":null},{"y":2012,"c":"Korea","r":"Other","e":72.557,"d":null,"l":80.9,"h":null},{"y":2012,"c":"Latvia","r":"Eastern Europe","e":70.86,"d":47.331,"l":null,"h":2.55},{"y":2012,"c":"Lithuania","r":"Eastern Europe","e":72.48,"d":51.835,"l":null,"h":0.41},{"y":2012,"c":"Luxembourg","r":"Central Europe","e":74.943,"d":17.688,"l":81.5,"h":3.16},{"y":2012,"c":"Mexico","r":"Americas","e":68.102,"d":null,"l":74.9,"h":28.88},{"y":2012,"c":"Netherlands","r":"Central Europe","e":null,"d":null,"l":81.2,"h":0.59},{"y":2012,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":15.601,"l":81.2,"h":null},{"y":2012,"c":"Norway","r":"Nordic","e":81.547,"d":15.595,"l":81.5,"h":3.06},{"y":2012,"c":"Poland","r":"Eastern Europe","e":67.45,"d":25.019,"l":76.9,"h":7.58},{"y":2012,"c":"Portugal","r":"Mediterranean","e":66.469,"d":12.262,"l":80.6,"h":8.76},{"y":2012,"c":"Slovak Republic","r":"Eastern Europe","e":68.848,"d":23.852,"l":null,"h":6.47},{"y":2012,"c":"Slovenia","r":"Eastern Europe","e":70.968,"d":57.491,"l":80.3,"h":5.71},{"y":2012,"c":"Spain","r":"Mediterranean","e":62.231,"d":null,"l":82.5,"h":null},{"y":2012,"c":"Sweden","r":"Nordic","e":82.314,"d":18.324,"l":81.8,"h":1.14},{"y":2012,"c":"Switzerland","r":"Central Europe","e":81.96,"d":14.728,"l":82.8,"h":0.41},{"y":2012,"c":"T\u00fcrkiye","r":"Other","e":54.216,"d":6.299,"l":null,"h":43.29},{"y":2012,"c":"United Kingdom","r":"Anglo-Saxon","e":75.171,"d":12.865,"l":null,"h":12.26},{"y":2012,"c":"United States","r":"Anglo-Saxon","e":72.181,"d":25.237,"l":null,"h":11.34},{"y":2013,"c":"Australia","r":"Anglo-Saxon","e":75.335,"d":15.945,"l":null,"h":14.0},{"y":2013,"c":"Austria","r":"Central Europe","e":75.27,"d":22.327,"l":null,"h":7.59},{"y":2013,"c":"Belgium","r":"Central Europe","e":70.32,"d":21.452,"l":80.7,"h":4.57},{"y":2013,"c":"Canada","r":"Anglo-Saxon","e":76.326,"d":18.944,"l":81.8,"h":4.15},{"y":2013,"c":"Chile","r":"Americas","e":73.338,"d":17.623,"l":79.4,"h":13.42},{"y":2013,"c":"Colombia","r":"Americas","e":73.682,"d":12.228,"l":75.0,"h":33.28},{"y":2013,"c":"Costa Rica","r":"Americas","e":null,"d":11.548,"l":79.6,"h":null},{"y":2013,"c":"Czechia","r":"Eastern Europe","e":75.801,"d":20.169,"l":78.3,"h":6.98},{"y":2013,"c":"Denmark","r":"Nordic","e":76.044,"d":14.73,"l":null,"h":1.53},{"y":2013,"c":"Estonia","r":"Eastern Europe","e":76.102,"d":null,"l":77.5,"h":3.26},{"y":2013,"c":"Finland","r":"Nordic","e":75.035,"d":49.209,"l":81.1,"h":3.58},{"y":2013,"c":"France","r":"Central Europe","e":71.546,"d":18.941,"l":82.4,"h":null},{"y":2013,"c":"Germany","r":"Central Europe","e":78.649,"d":18.286,"l":80.6,"h":5.26},{"y":2013,"c":"Greece","r":"Mediterranean","e":55.643,"d":null,"l":81.4,"h":6.11},{"y":2013,"c":"Hungary","r":"Eastern Europe","e":null,"d":27.093,"l":75.8,"h":3.2},{"y":2013,"c":"Iceland","r":"Nordic","e":82.72,"d":25.276,"l":82.1,"h":16.15},{"y":2013,"c":"Ireland","r":"Anglo-Saxon","e":67.451,"d":15.839,"l":null,"h":3.93},{"y":2013,"c":"Israel","r":"Other","e":74.518,"d":8.922,"l":82.1,"h":16.03},{"y":2013,"c":"Italy","r":"Mediterranean","e":62.635,"d":12.852,"l":82.9,"h":3.66},{"y":2013,"c":"Japan","r":"Other","e":77.544,"d":23.415,"l":83.4,"h":null},{"y":2013,"c":"Korea","r":"Other","e":72.959,"d":null,"l":81.4,"h":null},{"y":2013,"c":"Latvia","r":"Eastern Europe","e":72.501,"d":43.844,"l":null,"h":2.27},{"y":2013,"c":"Lithuania","r":"Eastern Europe","e":73.554,"d":56.341,"l":null,"h":0.26},{"y":2013,"c":"Luxembourg","r":"Central Europe","e":74.644,"d":14.792,"l":81.9,"h":3.47},{"y":2013,"c":"Mexico","r":"Americas","e":68.157,"d":null,"l":75.2,"h":28.81},{"y":2013,"c":"Netherlands","r":"Central Europe","e":null,"d":null,"l":81.4,"h":0.45},{"y":2013,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":14.646,"l":81.4,"h":null},{"y":2013,"c":"Norway","r":"Nordic","e":81.203,"d":15.849,"l":81.8,"h":2.75},{"y":2013,"c":"Poland","r":"Eastern Europe","e":67.613,"d":24.428,"l":77.1,"h":7.41},{"y":2013,"c":"Portugal","r":"Mediterranean","e":66.003,"d":12.446,"l":80.9,"h":9.2},{"y":2013,"c":"Slovak Republic","r":"Eastern Europe","e":68.671,"d":21.295,"l":null,"h":7.02},{"y":2013,"c":"Slovenia","r":"Eastern Europe","e":69.984,"d":56.211,"l":80.5,"h":5.62},{"y":2013,"c":"Spain","r":"Mediterranean","e":61.31,"d":null,"l":83.2,"h":null},{"y":2013,"c":"Sweden","r":"Nordic","e":82.626,"d":18.922,"l":82.0,"h":1.13},{"y":2013,"c":"Switzerland","r":"Central Europe","e":81.761,"d":15.038,"l":82.9,"h":0.4},{"y":2013,"c":"T\u00fcrkiye","r":"Other","e":54.691,"d":7.022,"l":null,"h":40.85},{"y":2013,"c":"United Kingdom","r":"Anglo-Saxon","e":75.942,"d":13.66,"l":null,"h":12.66},{"y":2013,"c":"United States","r":"Anglo-Saxon","e":72.319,"d":25.993,"l":null,"h":11.2},{"y":2014,"c":"Australia","r":"Anglo-Saxon","e":75.049,"d":17.337,"l":null,"h":13.36},{"y":2014,"c":"Austria","r":"Central Europe","e":75.027,"d":22.845,"l":null,"h":7.31},{"y":2014,"c":"Belgium","r":"Central Europe","e":70.501,"d":21.776,"l":81.4,"h":4.73},{"y":2014,"c":"Canada","r":"Anglo-Saxon","e":76.009,"d":20.068,"l":81.9,"h":4.0},{"y":2014,"c":"Chile","r":"Americas","e":73.121,"d":16.815,"l":79.6,"h":13.1},{"y":2014,"c":"Colombia","r":"Americas","e":73.949,"d":12.707,"l":75.2,"h":30.54},{"y":2014,"c":"Costa Rica","r":"Americas","e":null,"d":10.016,"l":79.7,"h":null},{"y":2014,"c":"Czechia","r":"Eastern Europe","e":76.71,"d":19.46,"l":78.9,"h":5.98},{"y":2014,"c":"Denmark","r":"Nordic","e":76.387,"d":14.685,"l":null,"h":1.94},{"y":2014,"c":"Estonia","r":"Eastern Europe","e":76.738,"d":null,"l":77.4,"h":3.25},{"y":2014,"c":"Finland","r":"Nordic","e":74.824,"d":45.276,"l":81.3,"h":3.6},{"y":2014,"c":"France","r":"Central Europe","e":71.737,"d":17.493,"l":82.9,"h":null},{"y":2014,"c":"Germany","r":"Central Europe","e":79.097,"d":18.052,"l":81.2,"h":4.97},{"y":2014,"c":"Greece","r":"Mediterranean","e":56.045,"d":10.563,"l":81.5,"h":6.37},{"y":2014,"c":"Hungary","r":"Eastern Europe","e":null,"d":25.629,"l":76.0,"h":3.76},{"y":2014,"c":"Iceland","r":"Nordic","e":83.29,"d":22.773,"l":82.9,"h":16.42},{"y":2014,"c":"Ireland","r":"Anglo-Saxon","e":69.136,"d":14.855,"l":null,"h":4.06},{"y":2014,"c":"Israel","r":"Other","e":75.525,"d":8.604,"l":82.2,"h":14.74},{"y":2014,"c":"Italy","r":"Mediterranean","e":62.917,"d":12.397,"l":83.2,"h":3.83},{"y":2014,"c":"Japan","r":"Other","e":78.66,"d":22.173,"l":83.7,"h":null},{"y":2014,"c":"Korea","r":"Other","e":73.708,"d":null,"l":81.8,"h":null},{"y":2014,"c":"Latvia","r":"Eastern Europe","e":72.925,"d":44.057,"l":null,"h":2.44},{"y":2014,"c":"Lithuania","r":"Eastern Europe","e":74.994,"d":52.91,"l":null,"h":0.61},{"y":2014,"c":"Luxembourg","r":"Central Europe","e":75.661,"d":19.358,"l":82.3,"h":3.26},{"y":2014,"c":"Mexico","r":"Americas","e":67.673,"d":null,"l":75.1,"h":28.62},{"y":2014,"c":"Netherlands","r":"Central Europe","e":null,"d":null,"l":81.8,"h":0.45},{"y":2014,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":14.833,"l":81.4,"h":null},{"y":2014,"c":"Norway","r":"Nordic","e":81.318,"d":16.503,"l":82.2,"h":3.02},{"y":2014,"c":"Poland","r":"Eastern Europe","e":69.033,"d":21.977,"l":77.8,"h":7.25},{"y":2014,"c":"Portugal","r":"Mediterranean","e":68.723,"d":14.699,"l":81.3,"h":9.44},{"y":2014,"c":"Slovak Republic","r":"Eastern Europe","e":69.397,"d":19.653,"l":null,"h":6.22},{"y":2014,"c":"Slovenia","r":"Eastern Europe","e":70.397,"d":48.678,"l":81.2,"h":5.49},{"y":2014,"c":"Spain","r":"Mediterranean","e":62.661,"d":null,"l":83.3,"h":null},{"y":2014,"c":"Sweden","r":"Nordic","e":82.769,"d":19.133,"l":82.3,"h":1.09},{"y":2014,"c":"Switzerland","r":"Central Europe","e":82.172,"d":14.552,"l":83.3,"h":0.45},{"y":2014,"c":"T\u00fcrkiye","r":"Other","e":54.336,"d":6.895,"l":null,"h":39.32},{"y":2014,"c":"United Kingdom","r":"Anglo-Saxon","e":76.998,"d":14.918,"l":null,"h":12.87},{"y":2014,"c":"United States","r":"Anglo-Saxon","e":72.983,"d":27.016,"l":null,"h":11.59},{"y":2015,"c":"Australia","r":"Anglo-Saxon","e":75.58,"d":18.157,"l":null,"h":13.48},{"y":2015,"c":"Austria","r":"Central Europe","e":75.158,"d":22.042,"l":null,"h":7.13},{"y":2015,"c":"Belgium","r":"Central Europe","e":70.282,"d":21.379,"l":81.1,"h":4.31},{"y":2015,"c":"Canada","r":"Anglo-Saxon","e":76.137,"d":20.371,"l":81.9,"h":3.93},{"y":2015,"c":"Chile","r":"Americas","e":73.182,"d":17.101,"l":79.8,"h":11.31},{"y":2015,"c":"Colombia","r":"Americas","e":74.227,"d":13.305,"l":75.4,"h":28.99},{"y":2015,"c":"Costa Rica","r":"Americas","e":null,"d":12.082,"l":79.9,"h":null},{"y":2015,"c":"Czechia","r":"Eastern Europe","e":77.72,"d":18.431,"l":78.7,"h":6.04},{"y":2015,"c":"Denmark","r":"Nordic","e":77.234,"d":13.204,"l":null,"h":2.13},{"y":2015,"c":"Estonia","r":"Eastern Europe","e":78.445,"d":null,"l":78.0,"h":3.28},{"y":2015,"c":"Finland","r":"Nordic","e":74.718,"d":41.328,"l":81.6,"h":3.71},{"y":2015,"c":"France","r":"Central Europe","e":71.844,"d":17.439,"l":82.4,"h":null},{"y":2015,"c":"Germany","r":"Central Europe","e":79.362,"d":17.998,"l":80.7,"h":4.76},{"y":2015,"c":"Greece","r":"Mediterranean","e":57.643,"d":10.883,"l":81.1,"h":6.59},{"y":2015,"c":"Hungary","r":"Eastern Europe","e":null,"d":25.221,"l":75.7,"h":3.76},{"y":2015,"c":"Iceland","r":"Nordic","e":85.19,"d":25.627,"l":82.5,"h":17.16},{"y":2015,"c":"Ireland","r":"Anglo-Saxon","e":70.895,"d":12.856,"l":null,"h":4.58},{"y":2015,"c":"Israel","r":"Other","e":76.2,"d":8.59,"l":82.2,"h":14.93},{"y":2015,"c":"Italy","r":"Mediterranean","e":63.583,"d":11.836,"l":82.7,"h":3.96},{"y":2015,"c":"Japan","r":"Other","e":79.408,"d":20.885,"l":83.9,"h":null},{"y":2015,"c":"Korea","r":"Other","e":73.816,"d":null,"l":82.1,"h":null},{"y":2015,"c":"Latvia","r":"Eastern Europe","e":74.382,"d":45.164,"l":null,"h":2.34},{"y":2015,"c":"Lithuania","r":"Eastern Europe","e":76.404,"d":52.915,"l":null,"h":0.75},{"y":2015,"c":"Luxembourg","r":"Central Europe","e":73.775,"d":16.488,"l":82.4,"h":3.7},{"y":2015,"c":"Mexico","r":"Americas","e":68.13,"d":null,"l":75.1,"h":29.43},{"y":2015,"c":"Netherlands","r":"Central Europe","e":null,"d":null,"l":81.6,"h":0.51},{"y":2015,"c":"New Zealand","r":"Anglo-Saxon","e":null,"d":14.593,"l":81.5,"h":null},{"y":2015,"c":"Norway","r":"Nordic","e":80.662,"d":17.086,"l":82.4,"h":3.08},{"y":2015,"c":"Poland","r":"Eastern Europe","e":70.306,"d":18.837,"l":77.5,"h":6.83},{"y":2015,"c":"Portugal","r":"Mediterranean","e":70.575,"d":13.437,"l":81.3,"h":8.48},{"y":2015,"c":"Slovak Republic","r":"Eastern Europe","e":70.903,"d":null,"l":null,"h":5.58},{"y":2015,"c":"Slovenia","r":"Eastern Europe","e":71.38,"d":50.448,"l":80.9,"h":5.35},{"y":2015,"c":"Spain","r":"Mediterranean","e":64.642,"d":null,"l":83.0,"h":null},{"y":2015,"c":"Sweden","r":"Nordic","e":83.109,"d":19.066,"l":82.2,"h":1.11},{"y":2015,"c":"Switzerland","r":"Central Europe","e":82.741,"d":14.641,"l":83.0,"h":0.48},{"y":2015,"c":"T\u00fcrkiye","r":"Other","e":54.931,"d":6.644,"l":null,"h":36.85},{"y":2015,"c":"United Kingdom","r":"Anglo-Saxon","e":77.761,"d":15.479,"l":null,"h":12.87},{"y":2015,"c":"United States","r":"Anglo-Saxon","e":73.392,"d":28.605,"l":null,"h":11.43}].map(d => ({
-  year: d.y, country: d.c, region: d.r,
-  employment: d.e, deaths: d.d, lifeExp: d.l, longHours: d.h
-}));
-
-// ─── Region colour palette ───────────────────────────
-const REGION_COLORS = {
-  'Nordic':         '#3b82f6',
-  'Anglo-Saxon':    '#10b981',
-  'Eastern Europe': '#ef4444',
-  'Mediterranean':  '#f59e0b',
-  'Central Europe': '#8b5cf6',
-  'Americas':       '#06b6d4',
-  'Other':          '#64748b'
-};
-
-// Countries available for Scene 3 (both indicators ≥ 4 years)
-const S3_COUNTRIES = [
-  'Australia','Austria','Belgium','Canada','Chile','Colombia',
-  'Czechia','Denmark','Finland','France','Germany','Iceland',
-  'Ireland','Israel','Italy','Japan','Latvia','Lithuania',
-  'Luxembourg','Norway','Poland','Portugal','Slovak Republic',
-  'Slovenia','Sweden','Switzerland','Türkiye','United Kingdom',
-  'United States'
+// ============================================================
+// DATA  (Sex: Total, 2024 OECD How's Life?)
+// income        = Household net adjusted disposable income per capita, USD PPP
+// life_sat      = Life satisfaction, 0-10 scale
+// lack_social   = % population (15+) lacking social support
+// long_hours    = % employees working 50+ hrs/week
+// null          = data not available for that country/variable
+// ============================================================
+const allData = [
+  { country:"Austria",         income:53375, life_sat:7.622,  lack_social:10.996,  long_hours:4.24  },
+  { country:"Belgium",         income:50771, life_sat:7.598,  lack_social:9.248,   long_hours:3.60  },
+  { country:"Bulgaria",        income:null,  life_sat:6.239,  lack_social:6.890,   long_hours:0.16  },
+  { country:"Croatia",         income:32010, life_sat:7.188,  lack_social:7.795,   long_hours:1.75  },
+  { country:"Czechia",         income:39673, life_sat:7.388,  lack_social:6.621,   long_hours:3.17  },
+  { country:"Denmark",         income:45245, life_sat:7.585,  lack_social:5.257,   long_hours:2.71  },
+  { country:"Estonia",         income:32159, life_sat:7.066,  lack_social:6.322,   long_hours:1.95  },
+  { country:"Finland",         income:44714, life_sat:7.820,  lack_social:5.078,   long_hours:2.48  },
+  { country:"France",          income:49616, life_sat:7.139,  lack_social:12.243,  long_hours:5.97  },
+  { country:"Germany",         income:54773, life_sat:6.983,  lack_social:10.341,  long_hours:2.94  },
+  { country:"Greece",          income:31558, life_sat:6.738,  lack_social:18.555,  long_hours:3.20  },
+  { country:"Hungary",         income:35072, life_sat:7.100,  lack_social:5.570,   long_hours:1.60  },
+  { country:"Ireland",         income:44283, life_sat:7.517,  lack_social:7.980,   long_hours:3.86  },
+  { country:"Italy",           income:43147, life_sat:7.213,  lack_social:13.253,  long_hours:2.98  },
+  { country:"Japan",           income:36881, life_sat:5.890,  lack_social:13.021,  long_hours:null  },
+  { country:"Latvia",          income:29640, life_sat:6.932,  lack_social:6.032,   long_hours:0.48  },
+  { country:"Lithuania",       income:37704, life_sat:7.199,  lack_social:7.993,   long_hours:1.17  },
+  { country:"Luxembourg",      income:64376, life_sat:7.203,  lack_social:11.222,  long_hours:5.62  },
+  { country:"Netherlands",     income:52143, life_sat:7.618,  lack_social:8.570,   long_hours:1.97  },
+  { country:"Norway",          income:null,  life_sat:7.592,  lack_social:5.516,   long_hours:4.06  },
+  { country:"Poland",          income:37601, life_sat:7.615,  lack_social:10.468,  long_hours:3.04  },
+  { country:"Portugal",        income:38027, life_sat:7.256,  lack_social:11.390,  long_hours:6.88  },
+  { country:"Romania",         income:32087, life_sat:7.727,  lack_social:19.334,  long_hours:1.10  },
+  { country:"Slovak Republic", income:33124, life_sat:7.299,  lack_social:5.253,   long_hours:2.88  },
+  { country:"Slovenia",        income:38603, life_sat:7.674,  lack_social:6.638,   long_hours:2.88  },
+  { country:"Spain",           income:42295, life_sat:7.183,  lack_social:8.129,   long_hours:2.30  },
+  { country:"Sweden",          income:46092, life_sat:7.450,  lack_social:7.490,   long_hours:5.16  },
+  { country:"Switzerland",     income:null,  life_sat:7.700,  lack_social:8.758,   long_hours:5.03  },
+  { country:"Türkiye",         income:null,  life_sat:5.800,  lack_social:16.524,  long_hours:22.53 },
 ];
 
-// Country-specific insights for Scene 3 annotation
-const COUNTRY_INSIGHTS = {
-  'Slovenia':       'Employment held steady — yet deaths of despair exceeded 50 per 100k every year.',
-  'Lithuania':      'The highest death toll in the dataset; slight improvement by 2015 despite better employment.',
-  'Latvia':         'Death rate held above 43 per 100k throughout, even as employment recovered strongly.',
-  'United States':  'The only Anglo-Saxon nation where deaths of despair rose every year as employment improved.',
-  'Finland':        'Deaths of despair declined from 52 to 41 per 100k, but remain far above the OECD average.',
-  'Greece':         'Employment collapsed after 2010, yet deaths of despair stayed near OECD lows — a Mediterranean effect.',
-  'Iceland':        'Among the highest employment rates globally, yet deaths of despair rose from 20 to 26 per 100k.',
-  'Israel':         'The lowest death rate in the dataset — below 11 per 100k throughout the period.',
-  'Türkiye':        'Lowest deaths of despair in the dataset; employment gains were modest but consistent.',
-  'default':        'Track how employment and deaths of despair evolved from 2010 to 2015.'
-};
+// ============================================================
+// OLS REGRESSION HELPER
+// ============================================================
+function ols(pts, xField) {
+  const n   = pts.length;
+  const sx  = d3.sum(pts, d => d[xField]);
+  const sy  = d3.sum(pts, d => d.life_sat);
+  const sxy = d3.sum(pts, d => d[xField] * d.life_sat);
+  const sx2 = d3.sum(pts, d => d[xField] * d[xField]);
+  const denom = n * sx2 - sx * sx;
+  if (Math.abs(denom) < 1e-12) return { a: sy / n, b: 0 };
+  const b = (n * sxy - sx * sy) / denom;
+  const a = (sy - b * sx) / n;
+  return { a, b };
+}
 
-// ═══════════════════════════════════════════════════════
-// PARAMETERS (state variables)
-// ═══════════════════════════════════════════════════════
-const params = { scene: 0, year: 2010, country: 'Slovenia' };
+// ============================================================
+// SCENE CONFIGURATION
+// ============================================================
+const TEAL  = "#2ca58d";
+const AMBER = "#e07b2a";
+const BLUE  = "#5b8db8";
 
-// ═══════════════════════════════════════════════════════
-// CHART DIMENSIONS
-// ═══════════════════════════════════════════════════════
-const W = 860;
-const H_BAR = 620;            // height for bar-chart scenes
-const H_LINE = 435;           // height for line-chart scene
-const M = { top:28, right:228, bottom:58, left:168 };
-const cW = W - M.left - M.right;   // 464
-const cH = H_BAR - M.top - M.bottom; // 534
+const scenes = [
+  {
+    id: 0,
+    title: "Scene 1: Income and Life Satisfaction",
+    subtitle: "X-axis: Household net adjusted disposable income per capita (USD, PPP-adjusted, 2023 prices) | 25 countries",
+    xField: "income",
+    xLabel: "Income per capita (USD, PPP-adjusted)",
+    xDomain: [22000, 70000],
+    xFmt:   d => "$" + Math.round(d / 1000) + "k",
+    xTicks: 6,
+    highlights: { "Finland": TEAL, "Japan": AMBER },
+    annotations: [
+      {
+        country: "Finland",
+        dx: 80, dy: 55,
+        noteTitle: "Finland",
+        noteLabel: "$44,714 income · 7.82/10 satisfaction. Strong social bonds amplify economic well-being."
+      },
+      {
+        country: "Japan",
+        dx: 95, dy: -68,
+        noteTitle: "Japan",
+        noteLabel: "$36,881 income · only 5.89/10. High income alone does not guarantee well-being."
+      }
+    ]
+  },
+  {
+    id: 1,
+    title: "Scene 2: Social Connection and Life Satisfaction",
+    subtitle: "X-axis: Share of population (age 15+) with no one to count on for help (%) | 29 countries",
+    xField: "lack_social",
+    xLabel: "Lack of social support (%)",
+    xDomain: [2, 22],
+    xFmt:   d => d + "%",
+    xTicks: 5,
+    highlights: { "Finland": TEAL, "Türkiye": AMBER },
+    annotations: [
+      {
+        country: "Finland",
+        dx: 82, dy: 62,
+        noteTitle: "Finland",
+        noteLabel: "5.1% lack social support · 7.82/10. The most connected societies are the happiest."
+      },
+      {
+        country: "Türkiye",
+        dx: -148, dy: -62,
+        noteTitle: "Türkiye",
+        noteLabel: "16.5% lack social support · 5.80/10. Weak social bonds coincide with the lowest satisfaction."
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Scene 3: Long Working Hours and Life Satisfaction",
+    subtitle: "X-axis: Share of employees working 50 or more hours per week (%) | 28 countries (Japan excluded: data unavailable)",
+    xField: "long_hours",
+    xLabel: "Long working hours (% employees, 50+ hrs/week)",
+    xDomain: [0, 25],
+    xFmt:   d => d + "%",
+    xTicks: 6,
+    highlights: { "Finland": TEAL, "Türkiye": AMBER },
+    annotations: [
+      {
+        country: "Finland",
+        dx: 82, dy: 62,
+        noteTitle: "Finland",
+        noteLabel: "2.5% work very long hours · 7.82/10. Nordic countries protect work-life balance and top the chart."
+      },
+      {
+        country: "Türkiye",
+        dx: -152, dy: -65,
+        noteTitle: "Türkiye",
+        noteLabel: "22.5% work very long hours · 5.80/10. The most overworked population reports the lowest satisfaction."
+      }
+    ]
+  }
+];
 
-const ML = { top:52, right:95, bottom:62, left:80 };
-const cWL = W - ML.left - ML.right;  // 685
-const cHL = H_LINE - ML.top - ML.bottom; // 321
+// ============================================================
+// SVG SETUP
+// ============================================================
+const margin = { top: 32, right: 55, bottom: 68, left: 72 };
+const totalW  = 892;
+const totalH  = 480;
+const W = totalW - margin.left - margin.right;  // 765
+const H = totalH - margin.top  - margin.bottom; // 380
 
-// Persistent scene-level state
-let s0 = {}, s1 = {};
+const svg = d3.select("#chart")
+  .append("svg")
+  .attr("width", totalW)
+  .attr("height", totalH);
 
-// ═══════════════════════════════════════════════════════
+const g = svg.append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// ---- Y scale (fixed throughout all scenes) ----
+const yScale = d3.scaleLinear()
+  .domain([5.25, 8.20])
+  .range([H, 0]);
+
+// ---- X scale (domain updated per scene) ----
+const xScale = d3.scaleLinear().range([0, W]);
+
+// ---- Horizontal grid lines (fixed, drawn once) ----
+const gridG = g.append("g").attr("class", "grid");
+gridG.selectAll("line")
+  .data(yScale.ticks(6))
+  .join("line")
+    .attr("x1", 0).attr("x2", W)
+    .attr("y1", d => yScale(d))
+    .attr("y2", d => yScale(d))
+    .attr("stroke", "#efefef")
+    .attr("stroke-width", 1);
+
+// ---- Y axis (fixed, drawn once) ----
+const yAxisG = g.append("g").attr("class", "axis y-axis");
+yAxisG.call(
+  d3.axisLeft(yScale)
+    .ticks(6)
+    .tickSize(-W)
+    .tickFormat(d => d.toFixed(1))
+);
+// Style axis
+yAxisG.select(".domain").attr("stroke", "#ddd");
+yAxisG.selectAll(".tick line")
+  .attr("stroke", "#efefef")
+  .attr("stroke-dasharray", null);
+yAxisG.selectAll(".tick text")
+  .attr("fill", "#999")
+  .attr("font-size", "11px")
+  .attr("dx", "-4px");
+
+// Y label
+g.append("text")
+  .attr("class", "axis-label")
+  .attr("transform", "rotate(-90)")
+  .attr("x", -H / 2)
+  .attr("y", -55)
+  .attr("text-anchor", "middle")
+  .text("Life Satisfaction (0–10 scale)");
+
+// ---- X axis (updated per scene) ----
+const xAxisG = g.append("g")
+  .attr("class", "axis x-axis")
+  .attr("transform", `translate(0,${H})`);
+
+// X label (text updated per scene)
+const xLabelEl = g.append("text")
+  .attr("class", "axis-label")
+  .attr("x", W / 2)
+  .attr("y", H + 54)
+  .attr("text-anchor", "middle");
+
+// ---- OLS trend line ----
+const trendLine = g.append("line").attr("class", "trend-line");
+
+// ---- Annotation group placeholder ----
+// (real group appended/removed in renderScene)
+
+// ============================================================
+// DOTS: create all 29 once, keyed by country
+// ============================================================
+const dotsG = g.append("g").attr("class", "dots-group");
+
+const dots = dotsG.selectAll(".dot")
+  .data(allData, d => d.country)
+  .join("circle")
+    .attr("class", d => "dot dot-" + d.country.replace(/[^a-zA-Z]/g, ""))
+    .attr("cy", d => yScale(d.life_sat))
+    .attr("cx", W / 2)  // placeholder; updated in renderScene
+    .attr("r", 0)
+    .attr("fill", BLUE)
+    .attr("stroke", "white")
+    .attr("stroke-width", 1.2)
+    .attr("opacity", 0)
+    .style("cursor", "pointer");
+
+// ============================================================
 // TOOLTIP
-// ═══════════════════════════════════════════════════════
-const ttEl = document.getElementById('tooltip');
-function showTT(event, d, type) {
-  let html = `<strong>${d.country}</strong>`;
-  if (type === 'employment')
-    html += `<div class="tt-row"><span>Employment rate</span><span class="tt-val">${d.employment.toFixed(1)}%</span></div>`;
-  if (type === 'deaths')
-    html += `<div class="tt-row"><span>Deaths of despair</span><span class="tt-val">${d.deaths.toFixed(1)} / 100k</span></div>`;
-  if (d.lifeExp)
-    html += `<div class="tt-row"><span>Life expectancy</span><span class="tt-val">${d.lifeExp.toFixed(1)} yrs</span></div>`;
-  html += `<div class="tt-row"><span>Year</span><span class="tt-val">${d.year}</span></div>`;
-  ttEl.innerHTML = html;
-  ttEl.style.display = 'block';
-  moveTT(event);
-}
-function moveTT(event) {
-  ttEl.style.left = Math.min(event.clientX + 16, window.innerWidth - 230) + 'px';
-  ttEl.style.top  = Math.max(event.clientY - 36, 4) + 'px';
-}
-function hideTT() { ttEl.style.display = 'none'; }
+// ============================================================
+const tooltip  = d3.select("#tooltip");
+const ttName   = d3.select("#tt-name");
+const ttSat    = d3.select("#tt-sat");
+const ttX      = d3.select("#tt-x");
 
-// ═══════════════════════════════════════════════════════
-// SCENE MANAGEMENT
-// ═══════════════════════════════════════════════════════
-const SCENES = [
-  {
-    num: '01',
-    title: 'The Employment Recovery',
-    desc: 'After the 2008 financial crisis, most OECD nations gradually rebuilt their labor markets. Use the year slider to watch employment rates shift from 2010 to 2015 — but note how large the gap between leaders and laggards remains throughout.',
-    control: 'year'
-  },
-  {
-    num: '02',
-    title: 'Deaths of Despair: A Persistent Shadow',
-    desc: 'Employment tells only part of the story. Deaths from suicide, alcohol, and drugs — a metric researchers call "deaths of despair" — reveal that economic recovery alone did not restore well-being. Some nations show a devastating gap with their peers.',
-    control: 'year'
-  },
-  {
-    num: '03',
-    title: 'Explore a Country',
-    desc: 'Track how any OECD nation evolved across both dimensions from 2010 to 2015. The chart pre-loads with Slovenia — a striking paradox of stable employment coexisting with Eastern Europe\'s highest death rate from despair. Hover any point for details.',
-    control: 'country'
+dots
+  .on("mouseover", function(event, d) {
+    const scene = scenes[currentScene];
+    if (d[scene.xField] == null) return;
+
+    let xValStr;
+    if (scene.xField === "income") {
+      xValStr = "$" + d[scene.xField].toLocaleString();
+    } else {
+      xValStr = d[scene.xField].toFixed(1) + "%";
+    }
+
+    ttName.text(d.country);
+    ttSat.html(`Life satisfaction: <span>${d.life_sat.toFixed(2)} / 10</span>`);
+    ttX.html(`${scene.xLabel.replace(/\(.*/, "").trim()}: <span>${xValStr}</span>`);
+
+    tooltip.style("opacity", 1);
+    d3.select(this)
+      .raise()
+      .attr("stroke", "#333")
+      .attr("stroke-width", 2);
+  })
+  .on("mousemove", function(event) {
+    tooltip
+      .style("left",  (event.clientX + 16) + "px")
+      .style("top",   (event.clientY - 38) + "px");
+  })
+  .on("mouseout", function() {
+    tooltip.style("opacity", 0);
+    d3.select(this)
+      .attr("stroke", "white")
+      .attr("stroke-width", 1.2);
+  });
+
+// ============================================================
+// ANNOTATIONS
+// ============================================================
+function drawAnnotations(scene) {
+  const annotData = scene.annotations
+    .map(a => {
+      const d = allData.find(r => r.country === a.country);
+      if (!d || d[scene.xField] == null) return null;
+      return {
+        note: {
+          title: a.noteTitle,
+          label: a.noteLabel,
+          wrap: 178,
+          padding: 7
+        },
+        x: xScale(d[scene.xField]),
+        y: yScale(d.life_sat),
+        dx: a.dx,
+        dy: a.dy,
+        type: d3.annotationCallout
+      };
+    })
+    .filter(Boolean);
+
+  if (!annotData.length) return;
+
+  const makeAnnotations = d3.annotation().annotations(annotData);
+
+  const annG = g.append("g")
+    .attr("class", "annotation-group")
+    .style("opacity", 0)
+    .call(makeAnnotations);
+
+  // Override background fill (CSS rx/ry not always applied by browsers)
+  annG.selectAll("rect.annotation-note-bg")
+    .attr("fill", "rgba(22,22,38,0.90)")
+    .attr("rx", 4)
+    .attr("ry", 4);
+
+  annG.transition().duration(450).style("opacity", 1);
+}
+
+// ============================================================
+// RENDER SCENE
+// ============================================================
+let currentScene = 0;
+
+function renderScene(idx, instant) {
+  const scene = scenes[idx];
+  const dur = instant ? 0 : 800;
+
+  // -- UI labels --
+  document.getElementById("scene-title").textContent   = scene.title;
+  document.getElementById("scene-sub").textContent     = scene.subtitle;
+  document.getElementById("scene-counter").textContent = `Scene ${idx + 1} of 3`;
+  document.getElementById("btn-back").disabled = (idx === 0);
+  document.getElementById("btn-next").disabled = (idx === 2);
+
+  // -- Progress indicators --
+  document.querySelectorAll(".indicator").forEach(el => {
+    el.classList.toggle("active", parseInt(el.dataset.scene) === idx);
+  });
+
+  // -- Update X scale domain --
+  xScale.domain(scene.xDomain);
+
+  // -- Transition X axis --
+  const xAxis = d3.axisBottom(xScale)
+    .ticks(scene.xTicks)
+    .tickSize(-H)
+    .tickFormat(scene.xFmt);
+
+  if (instant) {
+    xAxisG.call(xAxis);
+  } else {
+    xAxisG.transition().duration(dur).call(xAxis);
   }
-];
+  xAxisG.select(".domain").attr("stroke", "#ddd");
+  // tick lines styled after transition via a small delay
+  setTimeout(() => {
+    xAxisG.selectAll(".tick line").attr("stroke", "#efefef");
+    xAxisG.selectAll(".tick text").attr("fill", "#999").attr("font-size", "11px");
+  }, instant ? 0 : dur);
 
-function renderScene(n) {
-  const s = SCENES[n];
-  document.getElementById('scene-num').textContent   = s.num;
-  document.getElementById('scene-title').textContent = s.title;
-  document.getElementById('scene-desc').textContent  = s.desc;
+  // -- X axis label --
+  xLabelEl.text(scene.xLabel);
 
-  document.getElementById('year-control').style.display    = s.control === 'year'    ? 'flex' : 'none';
-  document.getElementById('country-control').style.display = s.control === 'country' ? 'flex' : 'none';
+  // -- OLS trend line --
+  const validPts = allData.filter(d => d[scene.xField] != null);
+  const { a, b } = ols(validPts, scene.xField);
+  const xMin = d3.min(validPts, d => d[scene.xField]);
+  const xMax = d3.max(validPts, d => d[scene.xField]);
+  const y1 = a + b * xMin;
+  const y2 = a + b * xMax;
 
-  document.getElementById('btn-back').disabled = n === 0;
-  document.getElementById('btn-next').disabled = n === 2;
-  document.getElementById('btn-next').textContent = n === 1 ? 'Explore →' : 'Next →';
-
-  // Update all dot sets
-  document.querySelectorAll('#top-dots button, .nav-dots .dot').forEach((btn, i) => {
-    const idx = i % 3;
-    btn.classList.toggle('active', idx === n);
-  });
-
-  // Clear chart
-  d3.select('#chart').html('');
-  hideTT();
-
-  if (n === 0) renderScene0();
-  else if (n === 1) renderScene1();
-  else renderScene2();
-}
-
-function navigate(dir) {
-  params.scene = Math.max(0, Math.min(2, params.scene + dir));
-  renderScene(params.scene);
-}
-function goToScene(n) { params.scene = n; renderScene(n); }
-
-// ═══════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════
-function getYearData(year, field) {
-  return RAW_DATA.filter(d => d.year === year && d[field] != null)
-    .sort((a, b) => b[field] - a[field]);
-}
-
-function styleAxis(g, textColor) {
-  g.select('.domain').attr('stroke', '#d1d9e0');
-  g.selectAll('.tick line').attr('stroke', '#d1d9e0');
-  g.selectAll('.tick text').attr('fill', textColor || '#64748b').attr('font-size', 11).attr('font-family', 'Inter, sans-serif');
-}
-
-// ═══════════════════════════════════════════════════════
-// SCENE 0 — Employment Bar Chart
-// ═══════════════════════════════════════════════════════
-function renderScene0() {
-  const svg = d3.select('#chart').attr('width', W).attr('height', H_BAR);
-
-  s0.x = d3.scaleLinear().domain([38, 92]).range([0, cW]);
-  s0.g = svg.append('g').attr('transform', `translate(${M.left},${M.top})`);
-
-  // Layers
-  s0.g.append('g').attr('class', 'grid-l');
-  s0.g.append('g').attr('class', 'bar-l');
-  s0.g.append('g').attr('class', 'lbl-l');
-  s0.g.append('g').attr('class', 'annot-l');
-
-  // Axes (static)
-  s0.xAxisG = s0.g.append('g').attr('class', 'x-axis')
-    .attr('transform', `translate(0,${cH})`);
-  s0.g.append('text')
-    .attr('x', cW / 2).attr('y', cH + 47).attr('text-anchor', 'middle')
-    .attr('font-family', 'Inter,sans-serif').attr('font-size', 12).attr('fill', '#64748b')
-    .text('Employment rate (% of population aged 25–64)');
-
-  // Avg line (created once, updated with transition)
-  s0.avgLine = s0.g.append('line').attr('id','avg-line-0')
-    .attr('y1', 0).attr('y2', cH)
-    .attr('stroke', '#f97316').attr('stroke-width', 2).attr('stroke-dasharray', '7,4');
-
-  updateScene0(false);
-}
-
-function updateScene0(animate) {
-  const data = getYearData(params.year, 'employment');
-  const avg  = d3.mean(data, d => d.employment);
-  const t    = d3.transition().duration(animate ? 720 : 0).ease(d3.easeQuadInOut);
-
-  // Y scale re-computed every update (order changes)
-  const y = d3.scaleBand().domain(data.map(d => d.country)).range([0, cH]).padding(0.22);
-  s0.y = y;
-
-  // Grid
-  s0.g.select('.grid-l').selectAll('line').data(s0.x.ticks(7))
-    .join('line')
-    .attr('x1', d => s0.x(d)).attr('x2', d => s0.x(d))
-    .attr('y1', 0).attr('y2', cH)
-    .attr('stroke', '#e9edf2').attr('stroke-width', 1);
-
-  // Bars (object constancy on country name)
-  s0.g.select('.bar-l').selectAll('.bar').data(data, d => d.country)
-    .join(
-      enter => enter.append('rect').attr('class','bar')
-        .attr('x', 0).attr('y', d => y(d.country))
-        .attr('height', y.bandwidth()).attr('width', 0)
-        .attr('fill','#2471a3').attr('rx', 2)
-        .on('mouseover', (ev,d) => showTT(ev,d,'employment'))
-        .on('mousemove', moveTT).on('mouseout', hideTT)
-        .call(e => e.transition(t).attr('width', d => s0.x(d.employment))),
-      update => update.call(u => u.transition(t)
-        .attr('y', d => y(d.country)).attr('width', d => s0.x(d.employment))
-        .attr('height', y.bandwidth())),
-      exit => exit.call(e => e.transition(t).attr('width', 0).attr('opacity', 0).remove())
-    );
-
-  // Country labels
-  s0.g.select('.lbl-l').selectAll('.clbl').data(data, d => d.country)
-    .join(
-      enter => enter.append('text').attr('class','clbl')
-        .attr('x', -7).attr('dy','0.35em').attr('text-anchor','end')
-        .attr('font-family','Inter,sans-serif').attr('font-size', 11)
-        .attr('fill','#1c2b3a').text(d => d.country)
-        .attr('y', d => y(d.country) + y.bandwidth()/2)
-        .attr('opacity', 0).call(e => e.transition(t).attr('opacity',1)),
-      update => update.call(u => u.transition(t)
-        .attr('y', d => y(d.country) + y.bandwidth()/2)),
-      exit => exit.call(e => e.transition(t).attr('opacity', 0).remove())
-    );
-
-  // Value labels
-  s0.g.select('.lbl-l').selectAll('.vlbl').data(data, d => d.country)
-    .join(
-      enter => enter.append('text').attr('class','vlbl')
-        .attr('dy','0.35em').attr('font-family','Inter,sans-serif').attr('font-size', 9.5)
-        .attr('fill','#64748b')
-        .attr('x', d => s0.x(d.employment) + 5)
-        .attr('y', d => y(d.country) + y.bandwidth()/2)
-        .text(d => d.employment.toFixed(1)+'%')
-        .attr('opacity', 0).call(e => e.transition(t).attr('opacity',1)),
-      update => update.text(d => d.employment.toFixed(1)+'%')
-        .call(u => u.transition(t)
-          .attr('x', d => s0.x(d.employment) + 5)
-          .attr('y', d => y(d.country) + y.bandwidth()/2)),
-      exit => exit.call(e => e.transition(t).attr('opacity', 0).remove())
-    );
-
-  // Avg line
-  s0.avgLine.transition(t).attr('x1', s0.x(avg)).attr('x2', s0.x(avg));
-
-  // X Axis
-  s0.xAxisG.call(d3.axisBottom(s0.x).ticks(7).tickFormat(d => d + '%'));
-  styleAxis(s0.xAxisG);
-
-  // Annotations
-  const annot = s0.g.select('.annot-l').html('');
-
-  // OECD avg callout box
-  const avgPx = s0.x(avg);
-  const bx = avgPx + 8;
-  const ay = 6;
-  annot.append('rect').attr('x', bx).attr('y', ay)
-    .attr('width', 148).attr('height', 38).attr('fill','#f97316').attr('rx',5).attr('opacity',.93);
-  annot.append('text').attr('x', bx+74).attr('y', ay+13).attr('text-anchor','middle')
-    .attr('fill','#fff').attr('font-family','Inter,sans-serif').attr('font-size',10).attr('font-weight',600)
-    .text('OECD Average');
-  annot.append('text').attr('x', bx+74).attr('y', ay+28).attr('text-anchor','middle')
-    .attr('fill','#fff').attr('font-family','Inter,sans-serif').attr('font-size',14).attr('font-weight',700)
-    .text(avg.toFixed(1) + '%');
-
-  // Sidebar
-  const sx = cW + 16;
-  const top3 = data.slice(0, 3);
-  const bot3 = data.slice(-3).reverse();
-
-  // Top-3 box
-  annot.append('rect').attr('x',sx-6).attr('y',0)
-    .attr('width',212).attr('height', top3.length*20+34)
-    .attr('fill','#f0f9ff').attr('rx',6).attr('stroke','#bae6fd').attr('stroke-width',1);
-  annot.append('text').attr('x',sx+2).attr('y',16).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#0369a1').text('▲ Highest Employment');
-  top3.forEach((d,i) => {
-    annot.append('text').attr('x',sx+8).attr('y', 34+i*20)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10.5).attr('fill','#1c2b3a')
-      .text(`${d.country}   ${d.employment.toFixed(1)}%`);
-  });
-
-  // Bot-3 box
-  const by0 = top3.length*20+50;
-  annot.append('rect').attr('x',sx-6).attr('y',by0)
-    .attr('width',212).attr('height', bot3.length*20+34)
-    .attr('fill','#fef2f2').attr('rx',6).attr('stroke','#fecaca').attr('stroke-width',1);
-  annot.append('text').attr('x',sx+2).attr('y',by0+16).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#dc2626').text('▼ Lowest Employment');
-  bot3.forEach((d,i) => {
-    annot.append('text').attr('x',sx+8).attr('y', by0+34+i*20)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10.5).attr('fill','#1c2b3a')
-      .text(`${d.country}   ${d.employment.toFixed(1)}%`);
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// SCENE 1 — Deaths of Despair Bar Chart
-// ═══════════════════════════════════════════════════════
-function renderScene1() {
-  const svg = d3.select('#chart').attr('width', W).attr('height', H_BAR);
-
-  s1.x = d3.scaleLinear().domain([0, 62]).range([0, cW]);
-  s1.g = svg.append('g').attr('transform', `translate(${M.left},${M.top})`);
-
-  s1.g.append('g').attr('class','grid-l');
-  s1.g.append('g').attr('class','bar-l');
-  s1.g.append('g').attr('class','lbl-l');
-  s1.g.append('g').attr('class','annot-l');
-
-  s1.xAxisG = s1.g.append('g').attr('class','x-axis').attr('transform',`translate(0,${cH})`);
-  s1.g.append('text')
-    .attr('x', cW/2).attr('y', cH+47).attr('text-anchor','middle')
-    .attr('font-family','Inter,sans-serif').attr('font-size',12).attr('fill','#64748b')
-    .text('Deaths from suicide, alcohol & drugs (per 100,000 people)');
-
-  // Legend for regions
-  const regions = Object.keys(REGION_COLORS);
-  const legG = s1.g.append('g').attr('transform',`translate(${cW+14},${cH-130})`);
-  legG.append('text').attr('y',-6).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#1c2b3a').text('Region');
-  regions.forEach((r, i) => {
-    const row = legG.append('g').attr('transform',`translate(0,${i*17+4})`);
-    row.append('rect').attr('width',10).attr('height',10).attr('rx',2).attr('fill',REGION_COLORS[r]);
-    row.append('text').attr('x',15).attr('y',9).attr('font-family','Inter,sans-serif')
-      .attr('font-size',10.5).attr('fill','#475569').text(r);
-  });
-
-  updateScene1(false);
-}
-
-function updateScene1(animate) {
-  const data = getYearData(params.year, 'deaths');
-  const t    = d3.transition().duration(animate ? 720 : 0).ease(d3.easeQuadInOut);
-  const y    = d3.scaleBand().domain(data.map(d => d.country)).range([0, cH]).padding(0.22);
-  s1.y = y;
-
-  // Grid
-  s1.g.select('.grid-l').selectAll('line').data(s1.x.ticks(6))
-    .join('line')
-    .attr('x1', d => s1.x(d)).attr('x2', d => s1.x(d))
-    .attr('y1',0).attr('y2',cH).attr('stroke','#e9edf2').attr('stroke-width',1);
-
-  // Bars
-  s1.g.select('.bar-l').selectAll('.bar').data(data, d => d.country)
-    .join(
-      enter => enter.append('rect').attr('class','bar')
-        .attr('x',0).attr('y', d => y(d.country))
-        .attr('height', y.bandwidth()).attr('width',0)
-        .attr('fill', d => REGION_COLORS[d.region] || '#64748b').attr('rx',2)
-        .on('mouseover', (ev,d) => showTT(ev,d,'deaths'))
-        .on('mousemove', moveTT).on('mouseout', hideTT)
-        .call(e => e.transition(t).attr('width', d => s1.x(d.deaths))),
-      update => update
-        .attr('fill', d => REGION_COLORS[d.region] || '#64748b')
-        .call(u => u.transition(t)
-          .attr('y', d => y(d.country)).attr('width', d => s1.x(d.deaths))
-          .attr('height', y.bandwidth())),
-      exit => exit.call(e => e.transition(t).attr('width',0).attr('opacity',0).remove())
-    );
-
-  // Country labels
-  s1.g.select('.lbl-l').selectAll('.clbl').data(data, d => d.country)
-    .join(
-      enter => enter.append('text').attr('class','clbl')
-        .attr('x',-7).attr('dy','0.35em').attr('text-anchor','end')
-        .attr('font-family','Inter,sans-serif').attr('font-size',11)
-        .attr('fill','#1c2b3a').text(d => d.country)
-        .attr('y', d => y(d.country)+y.bandwidth()/2).attr('opacity',0)
-        .call(e => e.transition(t).attr('opacity',1)),
-      update => update.call(u => u.transition(t)
-        .attr('y', d => y(d.country)+y.bandwidth()/2)),
-      exit => exit.call(e => e.transition(t).attr('opacity',0).remove())
-    );
-
-  // Value labels
-  s1.g.select('.lbl-l').selectAll('.vlbl').data(data, d => d.country)
-    .join(
-      enter => enter.append('text').attr('class','vlbl')
-        .attr('dy','0.35em').attr('font-family','Inter,sans-serif').attr('font-size',9.5)
-        .attr('fill','#64748b')
-        .attr('x', d => s1.x(d.deaths)+5).attr('y', d => y(d.country)+y.bandwidth()/2)
-        .text(d => d.deaths.toFixed(1)).attr('opacity',0)
-        .call(e => e.transition(t).attr('opacity',1)),
-      update => update.text(d => d.deaths.toFixed(1))
-        .call(u => u.transition(t)
-          .attr('x', d => s1.x(d.deaths)+5).attr('y', d => y(d.country)+y.bandwidth()/2)),
-      exit => exit.call(e => e.transition(t).attr('opacity',0).remove())
-    );
-
-  // X Axis
-  s1.xAxisG.call(d3.axisBottom(s1.x).ticks(6));
-  styleAxis(s1.xAxisG);
-
-  // Annotations
-  drawScene1Annotations(data);
-}
-
-function drawScene1Annotations(data) {
-  const annot = s1.g.select('.annot-l').html('');
-  const sx = cW + 14;
-
-  // Top-3 box (highest deaths)
-  const top3 = data.slice(0, 3);
-  annot.append('rect').attr('x',sx-6).attr('y',0)
-    .attr('width',210).attr('height', top3.length*22+36)
-    .attr('fill','#fef2f2').attr('rx',6).attr('stroke','#fecaca').attr('stroke-width',1);
-  annot.append('text').attr('x',sx+2).attr('y',16).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#dc2626').text('▲ Highest (per 100k)');
-  top3.forEach((d,i) => {
-    annot.append('text').attr('x',sx+8).attr('y',34+i*22)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10.5).attr('fill','#1c2b3a')
-      .text(`${d.country}   ${d.deaths.toFixed(1)}`);
-  });
-
-  // Bot-3 box (lowest deaths)
-  const bot3 = data.slice(-3).reverse();
-  const by0 = top3.length*22+54;
-  annot.append('rect').attr('x',sx-6).attr('y',by0)
-    .attr('width',210).attr('height',bot3.length*22+36)
-    .attr('fill','#f0fdf4').attr('rx',6).attr('stroke','#bbf7d0').attr('stroke-width',1);
-  annot.append('text').attr('x',sx+2).attr('y',by0+16).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#16a34a').text('▼ Lowest (per 100k)');
-  bot3.forEach((d,i) => {
-    annot.append('text').attr('x',sx+8).attr('y',by0+34+i*22)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10.5).attr('fill','#1c2b3a')
-      .text(`${d.country}   ${d.deaths.toFixed(1)}`);
-  });
-
-  // Callout note
-  const noteY = by0 + bot3.length*22 + 58;
-  const noteH = 72;
-  annot.append('rect').attr('x',sx-6).attr('y',noteY)
-    .attr('width',210).attr('height',noteH)
-    .attr('fill','#fffbeb').attr('rx',6).attr('stroke','#fde68a').attr('stroke-width',1);
-  annot.append('text').attr('x',sx+2).attr('y',noteY+15).attr('font-family','Playfair Display,serif')
-    .attr('font-size',11).attr('font-weight',700).attr('fill','#92400e').text('ℹ What counts?');
-
-  const noteLines = ['Suicide, alcohol poisoning,', 'and drug overdose deaths,', 'combined per 100,000 people.'];
-  noteLines.forEach((l,i) => {
-    annot.append('text').attr('x',sx+4).attr('y',noteY+30+i*14)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10).attr('fill','#78350f').text(l);
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// SCENE 2 — Country Line Chart
-// ═══════════════════════════════════════════════════════
-function renderScene2() {
-  const c    = params.country;
-  const cData = RAW_DATA.filter(d => d.country === c).sort((a,b) => a.year-b.year);
-  const empD = cData.filter(d => d.employment != null);
-  const dthD = cData.filter(d => d.deaths    != null);
-
-  // SVG
-  const svg = d3.select('#chart').attr('width', W).attr('height', H_LINE);
-  const g   = svg.append('g').attr('transform', `translate(${ML.left},${ML.top})`);
-
-  // Scales
-  const xSc  = d3.scaleLinear().domain([2010,2015]).range([0,cWL]);
-  const yEmp = d3.scaleLinear().domain([38, 95]).range([cHL,0]);
-  const yDth = d3.scaleLinear().domain([0, 65]).range([cHL,0]);
-
-  // Grid (employment grid lines)
-  g.append('g').selectAll('line').data(yEmp.ticks(5))
-    .join('line').attr('x1',0).attr('x2',cWL)
-    .attr('y1',d=>yEmp(d)).attr('y2',d=>yEmp(d))
-    .attr('stroke','#e9edf2').attr('stroke-width',1);
-
-  // Country name watermark
-  const reg = cData[0] ? cData[0].region : '';
-  g.append('text').attr('x', cWL/2).attr('y', cHL/2)
-    .attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','Playfair Display,serif').attr('font-size',48).attr('font-weight',700)
-    .attr('fill', REGION_COLORS[reg] || '#64748b').attr('opacity',.06)
-    .text(c);
-
-  // Employment line + dots
-  if (empD.length > 1) {
-    const empLine = d3.line().x(d=>xSc(d.year)).y(d=>yEmp(d.employment));
-    g.append('path').datum(empD).attr('fill','none')
-      .attr('stroke','#2471a3').attr('stroke-width',2.8)
-      .attr('stroke-linejoin','round').attr('d',empLine);
-    g.selectAll('.e-dot').data(empD).join('circle')
-      .attr('class','e-dot').attr('cx',d=>xSc(d.year)).attr('cy',d=>yEmp(d.employment))
-      .attr('r',5).attr('fill','#2471a3').attr('stroke','#fff').attr('stroke-width',2)
-      .on('mouseover',(ev,d)=>showTT(ev,d,'employment')).on('mousemove',moveTT).on('mouseout',hideTT);
+  if (instant) {
+    trendLine
+      .attr("x1", xScale(xMin)).attr("y1", yScale(y1))
+      .attr("x2", xScale(xMax)).attr("y2", yScale(y2));
+  } else {
+    trendLine.transition().duration(dur)
+      .attr("x1", xScale(xMin)).attr("y1", yScale(y1))
+      .attr("x2", xScale(xMax)).attr("y2", yScale(y2));
   }
 
-  // Deaths line + dots
-  if (dthD.length > 1) {
-    const dthLine = d3.line().x(d=>xSc(d.year)).y(d=>yDth(d.deaths));
-    g.append('path').datum(dthD).attr('fill','none')
-      .attr('stroke','#dc2626').attr('stroke-width',2.8)
-      .attr('stroke-dasharray','8,4').attr('stroke-linejoin','round').attr('d',dthLine);
-    g.selectAll('.d-dot').data(dthD).join('circle')
-      .attr('class','d-dot').attr('cx',d=>xSc(d.year)).attr('cy',d=>yDth(d.deaths))
-      .attr('r',5).attr('fill','#dc2626').attr('stroke','#fff').attr('stroke-width',2)
-      .on('mouseover',(ev,d)=>showTT(ev,d,'deaths')).on('mousemove',moveTT).on('mouseout',hideTT);
-  }
+  // -- Dots --
+  dots.each(function(d) {
+    const dot   = d3.select(this);
+    const valid = d[scene.xField] != null;
+    const hi    = scene.highlights[d.country];
+    const fill  = hi || BLUE;
+    const r     = hi ? 9 : 6.5;
+    const op    = hi ? 1.0 : 0.80;
 
-  // Axes
-  // Left (employment)
-  const axEmp = g.append('g').call(d3.axisLeft(yEmp).ticks(5).tickFormat(d=>d+'%'));
-  styleAxis(axEmp, '#2471a3');
-
-  // Right (deaths)
-  const axDth = g.append('g').attr('transform',`translate(${cWL},0)`)
-    .call(d3.axisRight(yDth).ticks(5));
-  styleAxis(axDth, '#dc2626');
-
-  // Bottom (years)
-  const axX = g.append('g').attr('transform',`translate(0,${cHL})`)
-    .call(d3.axisBottom(xSc).ticks(5).tickFormat(d3.format('d')));
-  styleAxis(axX);
-
-  // Axis labels
-  g.append('text').attr('transform','rotate(-90)').attr('x',-cHL/2).attr('y',-62)
-    .attr('text-anchor','middle').attr('font-family','Inter,sans-serif').attr('font-size',11.5)
-    .attr('fill','#2471a3').text('Employment rate (%)');
-  g.append('text').attr('transform','rotate(90)').attr('x',cHL/2).attr('y',-cWL-72)
-    .attr('text-anchor','middle').attr('font-family','Inter,sans-serif').attr('font-size',11.5)
-    .attr('fill','#dc2626').text('Deaths of despair (per 100k)');
-
-  // Legend
-  const leg = g.append('g').attr('transform',`translate(${cWL/2-140},-36)`);
-  leg.append('line').attr('x1',0).attr('x2',28).attr('y1',0).attr('y2',0)
-    .attr('stroke','#2471a3').attr('stroke-width',2.8);
-  leg.append('circle').attr('cx',14).attr('r',4.5).attr('fill','#2471a3');
-  leg.append('text').attr('x',34).attr('dy','0.35em')
-    .attr('font-family','Inter,sans-serif').attr('font-size',11.5).attr('fill','#1c2b3a')
-    .text('Employment rate (left axis)');
-  leg.append('line').attr('x1',185).attr('x2',213).attr('y1',0).attr('y2',0)
-    .attr('stroke','#dc2626').attr('stroke-width',2.8).attr('stroke-dasharray','7,3');
-  leg.append('circle').attr('cx',199).attr('r',4.5).attr('fill','#dc2626');
-  leg.append('text').attr('x',219).attr('dy','0.35em')
-    .attr('font-family','Inter,sans-serif').attr('font-size',11.5).attr('fill','#1c2b3a')
-    .text('Deaths of despair (right axis)');
-
-  // ── Dynamic annotations ──────────────────────────────
-  const annotG = g.append('g');
-
-  // Insight box (top-right)
-  const insight = COUNTRY_INSIGHTS[c] || COUNTRY_INSIGHTS['default'];
-  const insLines = wrapText(insight, 30);
-  const bW = 205, bH = insLines.length*14+32;
-  const bX = cWL - bW - 2, bY = 0;
-  annotG.append('rect').attr('x',bX).attr('y',bY).attr('width',bW).attr('height',bH)
-    .attr('fill','#1c2b3a').attr('rx',7).attr('opacity',.9);
-  annotG.append('text').attr('x',bX+12).attr('y',bY+16)
-    .attr('font-family','Playfair Display,serif').attr('font-size',11).attr('font-weight',700)
-    .attr('fill','#e2e8f0').text(c);
-  insLines.forEach((l,i) => {
-    annotG.append('text').attr('x',bX+10).attr('y',bY+30+i*14)
-      .attr('font-family','Inter,sans-serif').attr('font-size',10).attr('fill','#94a3b8').text(l);
+    if (valid) {
+      if (instant) {
+        dot.attr("cx", xScale(d[scene.xField]))
+           .attr("r", r).attr("fill", fill).attr("opacity", op);
+      } else {
+        dot.transition().duration(dur)
+           .attr("cx", xScale(d[scene.xField]))
+           .attr("r", r).attr("fill", fill).attr("opacity", op);
+      }
+    } else {
+      if (instant) {
+        dot.attr("opacity", 0).attr("r", 0);
+      } else {
+        dot.transition().duration(350)
+           .attr("opacity", 0).attr("r", 0);
+      }
+    }
   });
 
-  // End-point labels
-  const lastEmp = empD[empD.length-1];
-  const lastDth = dthD[dthD.length-1];
-  if (lastEmp) {
-    annotG.append('text').attr('x',xSc(lastEmp.year)+10).attr('y',yEmp(lastEmp.employment))
-      .attr('dy','0.35em').attr('font-family','Inter,sans-serif').attr('font-size',10.5)
-      .attr('font-weight',600).attr('fill','#2471a3')
-      .text(lastEmp.employment.toFixed(1)+'%');
-  }
-  if (lastDth) {
-    annotG.append('text').attr('x',xSc(lastDth.year)+10).attr('y',yDth(lastDth.deaths))
-      .attr('dy','0.35em').attr('font-family','Inter,sans-serif').attr('font-size',10.5)
-      .attr('font-weight',600).attr('fill','#dc2626')
-      .text(lastDth.deaths.toFixed(1));
-  }
+  // -- Annotations: remove old, draw new after transition --
+  g.select(".annotation-group")
+    .transition().duration(instant ? 0 : 220)
+    .style("opacity", 0)
+    .on("end", function() { d3.select(this).remove(); });
+
+  const annDelay = instant ? 30 : dur + 120;
+  setTimeout(() => drawAnnotations(scene), annDelay);
 }
 
-function wrapText(str, maxLen) {
-  const words = str.split(' ');
-  const lines = [];
-  let cur = '';
-  words.forEach(w => {
-    if ((cur+' '+w).trim().length > maxLen) { lines.push(cur.trim()); cur = w; }
-    else cur = (cur+' '+w).trim();
-  });
-  if (cur) lines.push(cur.trim());
-  return lines;
-}
-
-// ═══════════════════════════════════════════════════════
-// POPULATE COUNTRY DROPDOWN
-// ═══════════════════════════════════════════════════════
-(function populateSelect() {
-  const sel = document.getElementById('country-select');
-  S3_COUNTRIES.sort().forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
-    if (c === params.country) opt.selected = true;
-    sel.appendChild(opt);
-  });
-})();
-
-// ═══════════════════════════════════════════════════════
-// EVENT LISTENERS (Triggers)
-// ═══════════════════════════════════════════════════════
-document.getElementById('year-slider').addEventListener('input', function() {
-  params.year = +this.value;
-  document.getElementById('year-display').textContent = this.value;
-  if (params.scene === 0) updateScene0(true);
-  else if (params.scene === 1) updateScene1(true);
+// ============================================================
+// NAVIGATION TRIGGERS
+// ============================================================
+document.getElementById("btn-next").addEventListener("click", () => {
+  if (currentScene < 2) { currentScene++; renderScene(currentScene, false); }
 });
 
-document.getElementById('country-select').addEventListener('change', function() {
-  params.country = this.value;
-  d3.select('#chart').html('');
-  renderScene2();
+document.getElementById("btn-back").addEventListener("click", () => {
+  if (currentScene > 0) { currentScene--; renderScene(currentScene, false); }
 });
 
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-renderScene(0);
+// ============================================================
+// INITIAL RENDER
+// ============================================================
+renderScene(0, true);
+
 </script>
 </body>
 </html>
